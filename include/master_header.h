@@ -1,5 +1,6 @@
 #ifndef MASTER_HEADER_H
 #define MASTER_HEADER_H
+#pragma once
 /*
 ============================================
 *            MASTER HEADER
@@ -8,11 +9,9 @@
 ============================================
 */
 
-// STANDARD LIBRARY
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-#include <Arduino.h>
+// CUSTOM LIBRARY
+#include "ardu.h"
+#include "global.h"
 
 // DATATYPE LIBRARY
 #include "linked_list.h"
