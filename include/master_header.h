@@ -10,7 +10,6 @@
 */
 
 // CUSTOM LIBRARY
-#include "ardu.h"
 #include "global.h"
 
 // DATATYPE LIBRARY

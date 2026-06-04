@@ -6,10 +6,10 @@
 #include <Arduino.h>
 
 typedef enum SystemState : uint8_t {
-    TERSEDIA,
-    DIPINJAM,
-    RUSAK,
-    HABIS
+    TERSEDIA,   // Barang ada dan siap dipinjam
+    DIPINJAM,   // Barang sedang dipakai/dipinjam orang lain
+    RUSAK,      // Barang dalam kondisi tidak bisa digunakan
+    HABIS       // Stok barang sedang kosong
 } Status;
 
 
@@ -24,6 +24,17 @@ typedef struct{
     char *PIC;          // Nama PIC barang dalam dynamic array string
 } Barang;
 
+// ============================================================================
+// DEKLARASI FUNGSI (I/O)
+// ============================================================================
 
+// Membaca input teks dari pengguna dan mencegah overflow pada buffer
+void getStringInput(char* buffer, size_t bufferSize);
+
+// Membaca input berupa angka bulat positif (unsigned integer)
+void getIntInput(unsigned int* value);
+
+// Membaca input berupa karakter tunggal (char)
+void getCharInput(char* value);
 
 #endif
