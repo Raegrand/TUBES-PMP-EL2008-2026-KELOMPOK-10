@@ -6,6 +6,16 @@
 #include "add.h"
 #include "utils.h"
 
+char* dupString(const char* src) {
+    if (src == NULL) return NULL;
+    char* dst= (char*)malloc(strlen(src) + 1);
+
+    if (dst == NULL) return NULL;
+
+    strcpy(dst, src);
+    return dst;
+}
+
 void addItem(Node** head) {
     Serial.println();
     Serial.println(F("=== Tambah Barang ==="));
