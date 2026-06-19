@@ -6,100 +6,80 @@
 #include "add.h"
 #include "utils.h"
 
-char* dupString(const char* src) {
-    if (src == NULL) return NULL;
-    char* dst= (char*)malloc(strlen(src) + 1);
-
-    if (dst == NULL) return NULL;
-
-    strcpy(dst, src);
-    return dst;
-}
-
-void addItem(Node** head) {
+void addItem(int *head_index, bool slot_terpakai[]) {
     Serial.println();
     Serial.println(F("=== Tambah Barang ==="));
 
-    const size_t BUF = 64;
-    char buf[BUF];
-
+    // Membuat struct Barang lokal dan mengosongkan datanya
     Barang b;
     memset(&b, 0, sizeof(Barang));
 
-    //ID
+    // ID   
     Serial.print(F("ID Barang (angka): "));
     getIntInput(&b.id);
 
-    // Cek duplikat ID terlebih dahulu sebelum mengalokasikan heap apapun
-    Node* existing = NULL;
-    findNodeById(*head, b.id, &existing);
-    if (existing != NULL) {
-        Serial.println(F("Gagal: ID sudah terdaftar. Gunakan ID lain."));
-        return;
-    }
+    // // Cek duplikat ID di Flash Memory
+    // Node cekNode = findNodeById(b.id);
+    // if (cekNode.data.id != 0) { // Jika ID tidak 0, berarti barang dengan ID tersebut sudah ada
+    //     Serial.println(F("Gagal: ID sudah terdaftar. Gunakan ID lain."));
+    //     return;
+    // }
 
     // Nama
     Serial.print(F("Nama Barang: "));
-    getStringInput(buf, BUF);
-    b.nama = dupString(buf);
-    if (b.nama == NULL) {
-        Serial.println(F("Gagal: memori tidak cukup (nama)."));
-        freeBarang(&b);
+    // Menggunakan sizeof(b.nama) agar otomatis menyesuaikan dengan batas 16 karakter
+    getStringInput(b.nama, sizeof(b.nama)); 
+    if (strlen(b.nama) == 0) {
+        Serial.println(F("Gagal: nama tidak boleh kosong."));
         return;
     }
 
-    //Kategori
+    // Kategori
     Serial.println(F("Kategori (E=Elektronik, M=Mekanik, K=Kimia, L=Lainnya): "));
     getCharInput(&b.kategori);
 
-    //Jumlah stok
+    // Jumlah stok
     Serial.print(F("Jumlah Stok: "));
     getIntInput(&b.stock);
 
-    //Lokasi
+    // Lokasi
     Serial.print(F("Lokasi Penyimpanan: "));
-    getStringInput(buf, BUF);
-    b.lokasi = dupString(buf);
-    if (b.lokasi == NULL) {
-        Serial.println(F("Gagal: memori tidak cukup (lokasi)."));
-        freeBarang(&b);
+    // Menggunakan sizeof(b.lokasi) yang berukuran 8 karakter
+    getStringInput(b.lokasi, sizeof(b.lokasi)); 
+    if (strlen(b.lokasi) == 0) {
+        Serial.println(F("Gagal: lokasi tidak boleh kosong."));
         return;
     }
 
-    //Status
+    // Status
     Serial.println(F("Status (1=Tersedia, 2=Dipinjam, 3=Rusak, 4=Habis): "));
     unsigned int ps = 0;
     getIntInput(&ps);
-    b.stat = intToStatus(ps);
+    b.stat = intToStatus(ps); // Asumsi fungsi ini ada di utils.h untuk konversi ke Enum
 
-    //Pemilik
+    // Pemilik
     Serial.print(F("Pemilik Barang: "));
-    getStringInput(buf, BUF);
-    b.pemilik = dupString(buf);
-    if (b.pemilik == NULL) {
-        Serial.println(F("Gagal: memori tidak cukup (pemilik)."));
-        freeBarang(&b);
+    getStringInput(b.pemilik, sizeof(b.pemilik));
+    if (strlen(b.pemilik) == 0) {
+        Serial.println(F("Gagal: pemilik tidak boleh kosong."));
         return;
     }
 
-    //PIC
-    getStringInput(buf, BUF);
-    b.PIC = dupString(buf);
-    if (b.PIC == NULL) {
-        Serial.println(F("Gagal: memori tidak cukup (PIC)."));
-        freeBarang(&b);
+    // PIC
+    Serial.print(F("Nama PIC: ")); // Ditambahkan baris Serial.print yang tadinya tertinggal
+    getStringInput(b.PIC, sizeof(b.PIC));
+    if (strlen(b.PIC) == 0) {
+        Serial.println(F("Gagal: PIC tidak boleh kosong."));
         return;
     }
 
-    //Masukkan ke linkedlist
+    // Masukkan ke Flash Memory menggunakan fungsi yang sudah kita buat
     int success = 0;
-    addNodeToList(head, b, &success);
+    addNodeToList(b, &success, head_index, slot_terpakai);
 
     if (success == 1) {
-        Serial.println(F("Barang berhasil ditambahkan."));
+        Serial.println(F("Barang berhasil ditambahkan ke memori Flash."));
     } else {
-        // Node malloc gagal; string yang sudah dialokasikan harus dibebaskan
-        Serial.println(F("Gagal: tidak dapat mengalokasikan node (memori penuh)."));
-        freeBarang(&b);
+        Serial.println(F("Gagal: Kapasitas memori Flash (200 Slot) sudah penuh."));
     }
 }

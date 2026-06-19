@@ -22,5 +22,6 @@
 #include "remove.h"
 #include "edit.h"
 #include "search.h"
+#include "utils.h"
 
 #endif

@@ -4,100 +4,127 @@
 #include <string.h>
 #include "linked_list.h"
 #include "utils.h"
+#include "EEPROM.h"
 
-void initList(Node** head) {
-    if (head == NULL) return;
-    *head = NULL;
+void initSlot(int *head_index, bool slot_terpakai[]) {
+    memset(slot_terpakai, false, sizeof(bool) * MAX_NODES);
+
+    EEPROM.get(EEPROM_HEAD_ADDR, *head_index);
+
+    if (*head_index < -1 || *head_index >= MAX_NODES) {
+        *head_index = -1;
+        EEPROM.put(EEPROM_HEAD_ADDR, *head_index);
+    }
+
+    int current = *head_index;
+    int count = 0;
+    while (current != -1 && count < MAX_NODES) {
+        slot_terpakai[current] = true; // Tandai loker ini terpakai
+        Node n = readNodeFromFlash(current);
+        current = n.next;
+        count++;
+    }
+    
+    Serial.print("Sistem Siap. Jumlah barang tersimpan: ");
+    Serial.println(count);
 }
 
-void addNodeToList(Node** head, Barang newBarang, int* success) {
+int getSlotKosong(bool slot_terpakai[]) {
+    for (int i = 0; i < MAX_NODES; i++) {
+        if (!slot_terpakai[i]) {
+            return i; 
+        }
+    }
+    return -1;
+}
+
+void addNodeToList(Barang newBarang, int* success, int *head_index, bool slot_terpakai[]){
     *success = 0;
 
-    if (head == NULL) return;
-
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    if (newNode == NULL) return;    
-    newNode->data = newBarang;      
-    newNode->next = NULL;
-    if (*head == NULL) {
-        *head = newNode;
-        *success = 1;
+    int slot_baru = getSlotKosong(slot_terpakai);
+    if (slot_baru == -1) {
+        Serial.print("GAGAL: Penyimpanan Flash Penuh (");
+        Serial.print(MAX_NODES);
+        Serial.print("/");
+        Serial.print(MAX_NODES);
+        Serial.println(")");
         return;
     }
-    Node* temp = *head;
-    while (temp->next != NULL) {
-        temp = temp->next;
-    }
-    temp->next = newNode;
-    *success = 1;
+
+    Node nodeBaru;
+    nodeBaru.data = newBarang;
+    nodeBaru.next = *head_index;
+
+    Serial.println(F("Breakpoint1.1"));
+    Serial.flush();
+
+    saveNodeToFlash(slot_baru, &nodeBaru);
+
+    Serial.println(F("Breakpoint1.2"));
+    Serial.flush();
+
+    slot_terpakai[slot_baru] = true;
+    *head_index = slot_baru;
+    EEPROM.put(EEPROM_HEAD_ADDR, *head_index); 
+
+    Serial.print("Berhasil menambah barang di slot: ");
+    Serial.println(slot_baru);
+    Serial.flush();
 }
 
-void deleteNodeFromList(Node** head, unsigned int targetId, int* success) {
+void deleteNodeFromList(unsigned int targetId, int* success, int *head_index, bool slot_terpakai[]){
     *success = 0;
 
-    if (head == NULL || *head == NULL) return;
+    if (*head_index == -1) {
+        Serial.println("GAGAL: List kosong, tidak ada yang bisa dihapus.");
+        return;
+    }
 
-    Node* temp = *head;
-    Node* prev = NULL;
+    int current_index = *head_index;
+    int prev_index = -1;
+    int count = 0;
 
-    // Traverse sambil mencari ID yang cocok
-    while (temp != NULL) {
-        if (temp->data.id == targetId) {
+    while (current_index != -1 && count < MAX_NODES) {
+        Node currentNode = readNodeFromFlash(current_index);
 
-            
-            if (prev== NULL) {
-                *head = temp->next;
+        if (currentNode.data.id == targetId) {            
+            if (prev_index == -1) {
+                *head_index = currentNode.next;
+                EEPROM.put(EEPROM_HEAD_ADDR, *head_index);
             } else {
-                prev->next = temp->next;
+                Node prevNode = readNodeFromFlash(prev_index);
+                prevNode.next = currentNode.next;
+                
+                saveNodeToFlash(prev_index, &prevNode);
             }
 
-            freeBarang(&temp->data);
-            free(temp);
+            slot_terpakai[current_index] = false;
 
+            Serial.print("Berhasil menghapus barang dengan ID: ");
+            Serial.println(targetId);
             *success = 1;
             return;
         }
-        prev = temp;
-        temp = temp->next;
+
+        // Lanjut ke node berikutnya
+        prev_index = current_index;
+        current_index = currentNode.next;
+        count++;
     }
+
+    Serial.print("GAGAL: Barang dengan ID ");
+    Serial.print(targetId);
+    Serial.println(" tidak ditemukan.");
+    *success = 0;
+    return;
 }
 
-void findNodeById(Node* head, unsigned int targetId, Node** result) {
-    *result = NULL;
+void removeList(int *head_index, bool slot_terpakai[]) {
+    *head_index = -1;
+    
+    EEPROM.put(EEPROM_HEAD_ADDR, *head_index);
 
-    Node* temp = head;
-    while (temp != NULL) {
-        if (temp->data.id == targetId) {
-            *result = temp;
-            return;
-        }
-        temp = temp->next;
-    }
-}
+    memset(slot_terpakai, false, sizeof(bool) * MAX_NODES);
 
-
-void countNodes(Node* head, int* count) {
-    *count = 0;
-    Node* temp = head;
-    while (temp != NULL) {
-        (*count)++;
-        temp = temp->next;
-    }
-}
-
-
-void freeAllNodes(Node** head) {
-    if (head == NULL) return;
-
-    Node* temp = *head;
-    Node* next = NULL;
-
-    while (temp != NULL) {
-        next = temp->next;          
-        freeBarang(&temp->data);
-        free(temp);
-        temp = next;
-    }
-
-    *head = NULL;
+    Serial.println(">> SEMUA DATA BERHASIL DIHAPUS (FORMAT SELESAI) <<\n");
 }

@@ -4,14 +4,13 @@
 #include "global.h"
 typedef struct Node {
     Barang data;        // Data barang dengan struct Barang dari global.h
-    struct Node* next;  
+    int next;  
 } Node;
 
-void initList(Node** head);
-void addNodeToList(Node** head, Barang newBarang, int* success);
-void deleteNodeFromList(Node** head, unsigned int targetId, int* success);
-void findNodeById(Node* head, unsigned int targetId, Node** result);
-void countNodes(Node* head, int* count);
-void freeAllNodes (Node**head);
+void initSlot(int *head_index, bool slot_terpakai[]);
+int getSlotKosong(bool slot_terpakai[]);
+void addNodeToList(Barang newBarang, int* success, int *head_index, bool slot_terpakai[]);
+void deleteNodeFromList(unsigned int targetId, int* success, int *head_index, bool slot_terpakai[]);
+void removeList(int *head_index, bool slot_terpakai[]);
 
 #endif

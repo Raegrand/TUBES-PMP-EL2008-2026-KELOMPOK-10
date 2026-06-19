@@ -3,11 +3,13 @@
 #include "linked_list.h"
 #include "remove.h"
 
-void deleteItem(Node** head) {
+void deleteItem(int *head_index, bool slot_terpakai[]) {
     Serial.println();
     Serial.println(F("=== Hapus Barang ==="));
 
-    if (head == NULL || *head == NULL) {
+    // Pengecekan list kosong menggunakan variabel global
+    // (Pastikan Anda sudah menambahkan 'extern int head_index;' di file header Anda)
+    if (*head_index == -1) {
         Serial.println(F("Data inventaris kosong."));
         return;
     }
@@ -16,12 +18,14 @@ void deleteItem(Node** head) {
     unsigned int targetId = 0;
     getIntInput(&targetId);
 
-    int success= 0;
-    deleteNodeFromList(head, targetId, &success);
+    // Panggil fungsi Flash Memory yang sudah kita buat sebelumnya
+    int success = 0;
+    deleteNodeFromList(targetId, &success, head_index, slot_terpakai);
 
     if (success == 1) {
-        Serial.println(F("Barang berhasil dihapus."));
+        Serial.println(F("Barang berhasil dihapus secara logis dari Flash."));
     } else {
+        // Jika hapusBarang mengembalikan false (ID tidak ketemu)
         Serial.println(F("Gagal: ID barang tidak ditemukan."));
     }
 }

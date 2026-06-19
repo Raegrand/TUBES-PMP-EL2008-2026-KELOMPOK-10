@@ -4,6 +4,6 @@
 #include "global.h"
 #include "linked_list.h"
 
-void addItem(Node** head);
+void addItem(int *head_index, bool slot_terpakai[]);
 
 #endif
