@@ -20,7 +20,7 @@ void addItem(Node** head) {
     Serial.println();
     Serial.println(F("=== Tambah Barang ==="));
 
-    const size_t BUF = 64;
+    const size_t BUF = MAX_NAME_LENGTH + 1;
     char buf[BUF];
 
     Barang b;
@@ -59,8 +59,8 @@ void addItem(Node** head) {
     //Lokasi
     Serial.print(F("Lokasi Penyimpanan: "));
     getStringInput(buf, BUF);
-    b.lokasi = dupString(buf);
-    if (b.lokasi == NULL) {
+    b.lokasi = getID(buf, 'L');
+    if (b.lokasi == 0) {
         Serial.println(F("Gagal: memori tidak cukup (lokasi)."));
         freeBarang(&b);
         return;
@@ -84,8 +84,8 @@ void addItem(Node** head) {
 
     //PIC
     getStringInput(buf, BUF);
-    b.PIC = dupString(buf);
-    if (b.PIC == NULL) {
+    b.PIC = getID(buf, 'P');
+    if (b.PIC == 0) {
         Serial.println(F("Gagal: memori tidak cukup (PIC)."));
         freeBarang(&b);
         return;
@@ -94,6 +94,7 @@ void addItem(Node** head) {
     //Masukkan ke linkedlist
     int success = 0;
     addNodeToList(head, b, &success);
+    saveToBackup(b); // Simpan ke backup
 
     if (success == 1) {
         Serial.println(F("Barang berhasil ditambahkan."));

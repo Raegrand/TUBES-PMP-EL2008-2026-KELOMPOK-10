@@ -6,6 +6,7 @@ typedef struct Node {
     Barang data;        // Data barang dengan struct Barang dari global.h
     struct Node* next;  
 } Node;
+extern Node* head;
 
 void initList(Node** head);
 void addNodeToList(Node** head, Barang newBarang, int* success);

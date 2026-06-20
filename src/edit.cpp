@@ -5,6 +5,7 @@
 #include "linked_list.h"
 #include "add.h"
 #include "utils.h"
+#include "search.h"
 
 void updateStock(Node* head) {
     Serial.println();
@@ -20,7 +21,7 @@ void updateStock(Node* head) {
     getIntInput(&targetId);
 
     Node* result = NULL;
-    findNodeById(head, targetId, &result);
+    result = searchListByID(targetId);
 
     if (result == NULL) {
         Serial.println(F("Gagal: ID barang tidak ditemukan."));
@@ -57,7 +58,7 @@ void updateStatus(Node* head) {
     getIntInput(&targetId);
 
     Node* result = NULL;
-    findNodeById(head, targetId, &result);
+    result = searchListByID(targetId);
 
     if (result == NULL) {
         Serial.println(F("Gagal: ID barang tidak ditemukan."));
