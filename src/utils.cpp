@@ -44,7 +44,7 @@ unsigned int getOrAddLookupEntry(byte countAddr, int startAddr, int maxEntries, 
     }
 
     if (count >= maxEntries) {
-        Serial.println("Error: Table is FULL!");
+        Serial.println(F("Error: Table is FULL!"));
         return 0; 
     }
 
@@ -72,7 +72,7 @@ int getID(const char* name, char selection) {
         return getOrAddLookupEntry(META_PIC_COUNT_ADDR, PIC_START_ADDR, MAX_PICS, 2000, name);
     } 
     else {
-        Serial.println("Error: Invalid selection! Use 'L' or 'P'.");
+        Serial.println(F("Error: Invalid selection! Use 'L' or 'P'."));
         return 0; 
     }
 }
@@ -88,6 +88,7 @@ bool getName(unsigned int searchId, char selection, char* outBuffer){
         countAddr = META_PIC_COUNT_ADDR;
         startAddr = PIC_START_ADDR;
     } else {
+        Serial.println(F("Error: Invalid selection! Use 'L' or 'P'."));
         strcpy(outBuffer, "Error");
         return false;
     }
@@ -123,7 +124,7 @@ bool addBarangBackup(BarangBackup newItem) {
     if (itemCount == 255) itemCount = 0; // Handle brand new EEPROM
 
     if (itemCount >= MAX_ITEMS) {
-        Serial.println("Error: Backup Storage is FULL (Max 50)!");
+        Serial.println(F("Error: Backup Storage is FULL (Max 50)!"));
         return false;
     }
 
@@ -151,9 +152,9 @@ bool saveToBackup(Barang activeItem){
     bool success = addBarangBackup(backupData);
     
     if (success) {
-        Serial.println("Backup successful!");
+        Serial.println(F("Backup successful!"));
     } else {
-        Serial.println("Backup failed.");
+        Serial.println(F("Backup failed."));
     }
     
     return success;
@@ -165,9 +166,9 @@ void loadDatabaseToLinkedList(){
 
     BarangBackup tempBackup;
 
-    Serial.print("Loading ");
+    Serial.print(F("Loading "));
     Serial.print(itemCount);
-    Serial.println(" items into SRAM Linked List...");
+    Serial.println(F(" items into SRAM Linked List..."));
 
     for (int i = 0; i < itemCount; i++) {
         int address = BACKUP_START_ADDR + (i * sizeof(BarangBackup));
@@ -177,7 +178,7 @@ void loadDatabaseToLinkedList(){
         Node* newNode = new Node; 
         
         if (newNode == NULL) {
-            Serial.println("CRITICAL ERROR: SRAM is full! Cannot load more items.");
+            Serial.println(F("CRITICAL ERROR: SRAM is full! Cannot load more items."));
             break; 
         }
 
@@ -196,7 +197,7 @@ void loadDatabaseToLinkedList(){
         head = newNode; 
     }
 
-    Serial.println("Database successfully loaded!");
+    Serial.println(F("Database successfully loaded!"));
 }
 
 void syncNodeToEEPROM(Node* updatedNode){

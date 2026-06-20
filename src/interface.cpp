@@ -3,7 +3,7 @@
 #include "linked_list.h"
 #include "utils.h"
 
-void tampilkanSemuaBarang(Node* head){
+void displayAll(Node* head){
     Serial.println();
     Serial.println(F("========================================="));
     Serial.println(F("         DAFTAR INVENTARIS BARANG        "));
@@ -72,7 +72,7 @@ void tampilkanSemuaBarang(Node* head){
     Serial.println(F("========================================="));
 }
 
-void tampilkanMenu(){
+void displayMenu(){
     Serial.println();
     Serial.println(F("========================================="));
     Serial.println(F("       SISTEM INVENTARIS GUDANG          "));
@@ -83,6 +83,7 @@ void tampilkanMenu(){
     Serial.println(F("4. Update Status Barang"));
     Serial.println(F("5. Hapus Barang"));
     Serial.println(F("6. Cari Barang"));
+    Serial.println(F("7. Hapus Semua Barang"));
     Serial.println(F("========================================="));
-    Serial.print(F("Masukkan pilihan Anda (1-6): "));
+    Serial.print(F("Masukkan pilihan Anda (1-7): "));
 }

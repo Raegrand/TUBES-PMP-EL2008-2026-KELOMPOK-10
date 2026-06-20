@@ -5,5 +5,6 @@
 #include "linked_list.h"
 
 void deleteItem(Node** head);
+void deleteAllItems(Node** head);
 
 #endif

@@ -8,19 +8,18 @@ void setup() {
   delay(100);
   initList(&head);
   loadDatabaseToLinkedList();
-  
   Serial.println(F("Arduino is ready! Type something and press enter:"));
 }
 
 void loop() {
-    tampilkanMenu();
+    displayMenu();
 
     unsigned int pilihan = 0;
     getIntInput(&pilihan); 
     Serial.println(pilihan); 
     switch (pilihan) {
         case 1:
-            tampilkanSemuaBarang(head);
+            displayAll(head);
             break;
             
         case 2:
@@ -40,11 +39,15 @@ void loop() {
             break;
 
         case 6:
-            searchItemByName(head);
+            searchItem(head);
+            break;
+
+        case 7://Khusus untuk testing, akan menghapus semua data barang yang ada di linked list dan EEPROM
+            deleteAllItems(&head);
             break;
             
         default:
-            Serial.println(F("Gagal: Pilihan tidak valid. Silakan ketik angka 1-5."));
+            Serial.println(F("Gagal: Pilihan tidak valid. Silakan ketik angka 1-7."));
             break;
     }
     

@@ -102,9 +102,9 @@ void addItem(Node** head) {
     //Masukkan ke linkedlist
     int success = 0;
     addNodeToList(head, b, &success);
-    saveToBackup(b); // Simpan ke backup
-
+    
     if (success == 1) {
+        saveToBackup(b); // Simpan ke backup
         Serial.println(F("Barang berhasil ditambahkan."));
     } else {
         // Node malloc gagal; string yang sudah dialokasikan harus dibebaskan

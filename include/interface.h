@@ -7,7 +7,7 @@
 #include "utils.h"
 
 
-void tampilkanSemuaBarang(Node* head);
-void tampilkanMenu();
+void displayAll(Node* head);
+void displayMenu();
 
 #endif

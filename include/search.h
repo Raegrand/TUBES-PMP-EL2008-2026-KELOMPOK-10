@@ -6,6 +6,6 @@
 
 Node* searchListByID(unsigned int searchId);
 void searchListByName(const char* targetName);
-void searchItemByName(Node* head);
+void searchItem(Node* head);
 
 #endif
