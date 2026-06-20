@@ -19,32 +19,33 @@ void updateStock(Node* head) {
     Serial.print(F("Masukkan ID barang: "));
     unsigned int targetId = 0;
     getIntInput(&targetId);
+    Serial.println(targetId);
 
-    Node* result = NULL;
-    result = searchListByID(targetId);
+    Node* result = searchListByID(targetId);
 
     if (result == NULL) {
         Serial.println(F("Gagal: ID barang tidak ditemukan."));
         return;
     }
 
-    // Tampilkan stok saat ini sebagai referensi user
     Serial.print(F("Stok saat ini: "));
     Serial.println(result->data.stock);
 
     Serial.print(F("Masukkan stok baru: "));
     getIntInput(&result->data.stock);
+    Serial.println(result->data.stock);
 
-    // Aturan bisnis: stok 0 → HABIS otomatis
     if (result->data.stock == 0) {
-        result->data.stat = HABIS;
+        result->data.stat = HABIS; // Asumsi HABIS adalah bagian dari enum Status
         Serial.println(F("Info: Status diubah ke 'Habis' karena stok = 0."));
     }
 
-    Serial.println(F("Stok berhasil diperbarui."));
+    syncNodeToEEPROM(result);
+
+    Serial.println(F("Stok berhasil diperbarui dan disimpan ke EEPROM."));
 }
 
-void updateStatus(Node* head) {
+void updateStatus(Node* head){
     Serial.println();
     Serial.println(F("=== Update Status ==="));
 
@@ -56,9 +57,9 @@ void updateStatus(Node* head) {
     Serial.print(F("Masukkan ID barang: "));
     unsigned int targetId = 0;
     getIntInput(&targetId);
+    Serial.println(targetId);
 
-    Node* result = NULL;
-    result = searchListByID(targetId);
+    Node* result = searchListByID(targetId);
 
     if (result == NULL) {
         Serial.println(F("Gagal: ID barang tidak ditemukan."));
@@ -68,7 +69,10 @@ void updateStatus(Node* head) {
     Serial.println(F("Status baru (1=Tersedia, 2=Dipinjam, 3=Rusak, 4=Habis): "));
     unsigned int ps = 0;
     getIntInput(&ps);
-    result->data.stat = intToStatus(ps);
+    Serial.println(ps);
+    result->data.stat = intToStatus(ps); // Pastikan intToStatus sudah didefinisikan
 
-    Serial.println(F("Status berhasil diperbarui."));
+    syncNodeToEEPROM(result);
+
+    Serial.println(F("Status berhasil diperbarui dan disimpan ke EEPROM."));
 }

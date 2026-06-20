@@ -20,7 +20,7 @@ void addItem(Node** head) {
     Serial.println();
     Serial.println(F("=== Tambah Barang ==="));
 
-    const size_t BUF = MAX_NAME_LENGTH + 1;
+    const size_t BUF = MAX_NAME_LENGTH;
     char buf[BUF];
 
     Barang b;
@@ -29,6 +29,7 @@ void addItem(Node** head) {
     //ID
     Serial.print(F("ID Barang (angka): "));
     getIntInput(&b.id);
+    Serial.println(b.id);
 
     // Cek duplikat ID terlebih dahulu sebelum mengalokasikan heap apapun
     Node* existing = NULL;
@@ -47,14 +48,17 @@ void addItem(Node** head) {
         freeBarang(&b);
         return;
     }
+    Serial.println(b.nama);
 
     //Kategori
     Serial.println(F("Kategori (E=Elektronik, M=Mekanik, K=Kimia, L=Lainnya): "));
     getCharInput(&b.kategori);
+    Serial.println(b.kategori);
 
     //Jumlah stok
     Serial.print(F("Jumlah Stok: "));
     getIntInput(&b.stock);
+    Serial.println(b.stock);
 
     //Lokasi
     Serial.print(F("Lokasi Penyimpanan: "));
@@ -65,12 +69,14 @@ void addItem(Node** head) {
         freeBarang(&b);
         return;
     }
+    Serial.println(buf);
 
     //Status
     Serial.println(F("Status (1=Tersedia, 2=Dipinjam, 3=Rusak, 4=Habis): "));
     unsigned int ps = 0;
     getIntInput(&ps);
     b.stat = intToStatus(ps);
+    Serial.println(ps);
 
     //Pemilik
     Serial.print(F("Pemilik Barang: "));
@@ -81,8 +87,9 @@ void addItem(Node** head) {
         freeBarang(&b);
         return;
     }
-
+    Serial.println(b.pemilik);
     //PIC
+    Serial.print(F("PIC: "));
     getStringInput(buf, BUF);
     b.PIC = getID(buf, 'P');
     if (b.PIC == 0) {
@@ -90,6 +97,7 @@ void addItem(Node** head) {
         freeBarang(&b);
         return;
     }
+    Serial.println(buf);
 
     //Masukkan ke linkedlist
     int success = 0;

@@ -96,14 +96,20 @@ bool getName(unsigned int searchId, char selection, char* outBuffer){
     if (count == 255) count = 0;
 
     unsigned int currentId;
+    
+    char tempString[10]; 
 
     for (int i = 0; i < count; i++) {
-        int address = startAddr + (i * ENTRY_SIZE);
+        int address = startAddr + (i * 12); // 12 is the ENTRY_SIZE
         
         EEPROM.get(address, currentId);
 
         if (currentId == searchId) {
-            EEPROM.get(address + sizeof(unsigned int), outBuffer);
+            
+            EEPROM.get(address + sizeof(unsigned int), tempString);
+            
+            strcpy(outBuffer, tempString);
+            
             return true; 
         }
     }
@@ -191,4 +197,65 @@ void loadDatabaseToLinkedList(){
     }
 
     Serial.println("Database successfully loaded!");
+}
+
+void syncNodeToEEPROM(Node* updatedNode){
+    if (updatedNode == NULL) return;
+
+    byte itemCount = EEPROM.read(META_ITEM_COUNT_ADDR);
+    if (itemCount == 255) itemCount = 0;
+
+    unsigned int targetId = updatedNode->data.id;
+    unsigned int currentId;
+
+    for (int i = 0; i < itemCount; i++) {
+        int address = BACKUP_START_ADDR + (i * sizeof(BarangBackup));
+        
+        EEPROM.get(address, currentId);
+
+        if (currentId == targetId) {
+            BarangBackup updatedBackup;
+            updatedBackup.id       = updatedNode->data.id;
+            updatedBackup.kategori = updatedNode->data.kategori;
+            updatedBackup.stock    = updatedNode->data.stock;
+            updatedBackup.lokasi   = updatedNode->data.lokasi;
+            updatedBackup.stat     = updatedNode->data.stat;
+            updatedBackup.PIC      = updatedNode->data.PIC;
+
+            EEPROM.put(address, updatedBackup);
+            return;
+        }
+    }
+    
+    Serial.println(F("Warning: ID tidak ditemukan di EEPROM. Backup gagal."));
+}
+
+void syncDeleteToEEPROM(unsigned int targetId){
+    byte itemCount = EEPROM.read(META_ITEM_COUNT_ADDR);
+    if (itemCount == 255 || itemCount == 0) return; // Empty EEPROM
+
+    int targetIndex = -1;
+    BarangBackup tempItem;
+
+    for (int i = 0; i < itemCount; i++) {
+        int address = BACKUP_START_ADDR + (i * sizeof(BarangBackup));
+        EEPROM.get(address, tempItem);
+        
+        if (tempItem.id == targetId) {
+            targetIndex = i;
+            break;
+        }
+    }
+
+    if (targetIndex == -1) return; 
+    for (int i = targetIndex; i < itemCount - 1; i++) {
+        int sourceAddr = BACKUP_START_ADDR + ((i + 1) * sizeof(BarangBackup));
+        int destAddr   = BACKUP_START_ADDR + (i * sizeof(BarangBackup));
+
+        EEPROM.get(sourceAddr, tempItem);
+        EEPROM.put(destAddr, tempItem);
+    }
+
+    itemCount--;
+    EEPROM.write(META_ITEM_COUNT_ADDR, itemCount);
 }

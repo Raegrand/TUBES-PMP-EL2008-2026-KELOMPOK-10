@@ -11,5 +11,7 @@ bool getName(unsigned int searchId, char selection, char* outBuffer);
 bool addBarangBackup(BarangBackup newItem);
 bool saveToBackup(Barang activeItem);
 void loadDatabaseToLinkedList();
+void syncNodeToEEPROM(Node* updatedNode);
+void syncDeleteToEEPROM(unsigned int targetId);
 
 #endif

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "linked_list.h"
 #include "remove.h"
+#include "utils.h"
 
 void deleteItem(Node** head) {
     Serial.println();
@@ -15,11 +16,12 @@ void deleteItem(Node** head) {
     Serial.print(F("Masukkan ID barang yang akan dihapus: "));
     unsigned int targetId = 0;
     getIntInput(&targetId);
-
+    Serial.println(targetId);
     int success= 0;
     deleteNodeFromList(head, targetId, &success);
 
     if (success == 1) {
+        syncDeleteToEEPROM(targetId);
         Serial.println(F("Barang berhasil dihapus."));
     } else {
         Serial.println(F("Gagal: ID barang tidak ditemukan."));

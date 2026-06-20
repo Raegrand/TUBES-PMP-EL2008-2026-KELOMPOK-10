@@ -8,31 +8,46 @@ void setup() {
   delay(100);
   initList(&head);
   loadDatabaseToLinkedList();
-  Barang temp;
-  if(success == 1){
-    for(int i = 0; i < 45; i++) {
-      Serial.print(F("Adding item with ID: "));
-      Serial.println(i);
-      temp.id = i;
-      temp.nama = dupString("Test");
-      temp.kategori = 'E';
-      temp.stock = 10;
-      temp.lokasi = getID("Test", 'L');
-      temp.stat = TERSEDIA;
-      temp.pemilik = dupString("Test");
-      temp.PIC = getID("Test", 'P');
-      addNodeToList(&head, temp, &success);
-      saveToBackup(temp);
-      if(success == 0){
-        Serial.print(F("Memory allocation failed at iteration: "));
-        Serial.println(i);
-        break;
-      }
-    } 
-  }
+  
   Serial.println(F("Arduino is ready! Type something and press enter:"));
 }
 
 void loop() {
-  delay(200);
+    tampilkanMenu();
+
+    unsigned int pilihan = 0;
+    getIntInput(&pilihan); 
+    Serial.println(pilihan); 
+    switch (pilihan) {
+        case 1:
+            tampilkanSemuaBarang(head);
+            break;
+            
+        case 2:
+            addItem(&head); 
+            break;
+            
+        case 3:
+            updateStock(head);
+            break;
+            
+        case 4:
+            updateStatus(head);
+            break;
+            
+        case 5:
+            deleteItem(&head);
+            break;
+
+        case 6:
+            searchItemByName(head);
+            break;
+            
+        default:
+            Serial.println(F("Gagal: Pilihan tidak valid. Silakan ketik angka 1-5."));
+            break;
+    }
+    
+    // Opsional: Berikan sedikit jeda sebelum menu muncul kembali
+    delay(500); 
 }
